@@ -17,15 +17,10 @@ public class UnityTasks : EditorWindow
     string[] tasksTitles = new string[20];
     string[] tasksDexcriptions = new string[20];
 
-
-    bool isEmpty;
     int current = 0;
 
-    //Delete later//////////////////////////////
-    int tempval;
-    string tmp;
     public Vector2 scrollPosition = Vector2.zero;
-    ////////////////////////////////////////////
+
 
     void Awake()
     {
