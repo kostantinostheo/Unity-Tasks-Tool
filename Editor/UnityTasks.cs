@@ -4,29 +4,25 @@ using System.IO;
 
 public class UnityTasks : EditorWindow
 {
-    string[] state_values = { "Open", "In Progress", "Closed" };
-    string[] priorities = { "Low", "Medium", "High" };
-
-    private string saveFileName = "UnityTasksSave.txt";
     private string fileFullPath;
-    
-    bool[] tasksStates = new bool[20];
 
-    int[] tasksStatus = new int[20];
-    int[] tasksPriorities = new int[20];
-    string[] tasksTitles = new string[20];
-    string[] tasksDexcriptions = new string[20];
+    private bool[] tasksStates = new bool[20];
 
-    int current = 0;
+    private int[] tasksStatus = new int[20];
+    private int[] tasksPriorities = new int[20];
+    private string[] tasksTitles = new string[20];
+    private string[] tasksDexcriptions = new string[20];
+
+    private int current = 0;
+    private int max_tasks = 10;
 
     public Vector2 scrollPosition = Vector2.zero;
 
-
     void Awake()
     {
-        fileFullPath = Application.persistentDataPath + "/" + saveFileName;
+        fileFullPath = Application.persistentDataPath + "/" + Const.saveFileName;
 
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < max_tasks; i++)
         {
             tasksStates[i] = false;
             tasksStatus[i] = 0;
@@ -35,7 +31,7 @@ public class UnityTasks : EditorWindow
             tasksDexcriptions[i] = "";
         }
 
-        if (SaveFileExists(fileFullPath))
+        if (Const.SaveFileExists(fileFullPath))
         {
             string[] saved_data = File.ReadAllLines(fileFullPath);
             current = saved_data.Length;
@@ -95,7 +91,7 @@ public class UnityTasks : EditorWindow
             }
         }
         GUILayout.Label("Create a new Task");
-        EditorGUI.BeginDisabledGroup(!SaveFileExists(fileFullPath));
+        EditorGUI.BeginDisabledGroup(!Const.SaveFileExists(fileFullPath));
         if (GUILayout.Button("Delete Save", GUILayout.Height(30)))
         {
             if (EditorUtility.DisplayDialog("Delete all saved data.",
@@ -105,7 +101,7 @@ public class UnityTasks : EditorWindow
                 File.Delete(fileFullPath);
                 Debug.Log("Succesfully Deleted");
                 AssetDatabase.Refresh();
-                Repaint();
+                Close();
             }
         }
         EditorGUI.EndDisabledGroup();
@@ -139,7 +135,7 @@ public class UnityTasks : EditorWindow
                     GUI.backgroundColor = new Color(0.505f, 0.874f, 0.815f);
                 else
                     GUI.backgroundColor = new Color(0.43922f, 0.85882f, 0.43922f);
-                tasksStatus[y] = EditorGUILayout.Popup(tasksStatus[y], state_values);
+                tasksStatus[y] = EditorGUILayout.Popup(tasksStatus[y], Const.state_values);
                 GUI.backgroundColor = Color.white;
 
                 if (tasksPriorities[y] == 0)
@@ -148,7 +144,7 @@ public class UnityTasks : EditorWindow
                     GUI.backgroundColor = new Color(1, 0.8f, 0.6f);
                 else
                     GUI.backgroundColor = new Color(0.960f, 0.278f, 0.278f);
-                tasksPriorities[y] = EditorGUILayout.Popup(tasksPriorities[y], priorities);
+                tasksPriorities[y] = EditorGUILayout.Popup(tasksPriorities[y], Const.priorities);
                 GUI.backgroundColor = Color.white;
 
                 GUILayout.EndHorizontal();
@@ -168,24 +164,14 @@ public class UnityTasks : EditorWindow
         }
         GUI.EndScrollView();
     }
-
-    private bool SaveFileExists(string path)
-    {
-        if (File.Exists(path))
-            return true;
-        else
-            return false;
-    }
     void GUILine(int i_height = 1)
     {
-
         Rect rect = EditorGUILayout.GetControlRect(false, i_height);
         rect.height = i_height;
         EditorGUI.DrawRect(rect, new Color(0.5f, 0.5f, 0.5f, 1));
     }
-
-    private string State(int value)
+    void OnInspectorUpdate()
     {
-        return state_values[value];
+        Repaint();
     }
 }
